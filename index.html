@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Agent Arthur Donnelley - Delta Green Soundboard</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Courier New", monospace;
+        background: #1a1a1a;
+        color: #00ff00;
+        padding: 20px;
+        min-height: 100vh;
+      }
+
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+
+      h1 {
+        text-align: center;
+        margin-bottom: 10px;
+        color: #00ff00;
+        text-shadow: 0 0 10px #00ff00;
+        font-size: 2em;
+      }
+
+      .subtitle {
+        text-align: center;
+        margin-bottom: 30px;
+        color: #00cc00;
+        font-size: 1.1em;
+      }
+
+      /* Static Control Panel */
+      .static-control {
+        background: #0a0a0a;
+        border: 2px solid #00ff00;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 30px;
+        box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+      }
+
+      .static-control h2 {
+        color: #00ff00;
+        margin-bottom: 15px;
+        font-size: 1.3em;
+      }
+
+      .static-controls {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        flex-wrap: wrap;
+      }
+
+      .static-controls button {
+        background: #003300;
+        color: #00ff00;
+        border: 2px solid #00ff00;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-family: "Courier New", monospace;
+        font-size: 1em;
+        transition: all 0.3s;
+      }
+
+      .static-controls button:hover {
+        background: #00ff00;
+        color: #000;
+        box-shadow: 0 0 15px #00ff00;
+      }
+
+      .static-controls button.active {
+        background: #00cc00;
+        color: #000;
+      }
+
+      .volume-control {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex: 1;
+      }
+
+      .volume-control label {
+        white-space: nowrap;
+      }
+
+      .volume-control input[type="range"] {
+        flex: 1;
+        max-width: 300px;
+        height: 8px;
+        background: #003300;
+        border-radius: 5px;
+        outline: none;
+      }
+
+      .volume-control input[type="range"]::-webkit-slider-thumb {
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        background: #00ff00;
+        border-radius: 50%;
+        cursor: pointer;
+        box-shadow: 0 0 10px #00ff00;
+      }
+
+      .volume-control input[type="range"]::-moz-range-thumb {
+        width: 20px;
+        height: 20px;
+        background: #00ff00;
+        border-radius: 50%;
+        cursor: pointer;
+        box-shadow: 0 0 10px #00ff00;
+      }
+
+      .volume-value {
+        min-width: 40px;
+        text-align: right;
+        color: #00ff00;
+      }
+
+      /* Soundboard Categories */
+      .category {
+        background: #0a0a0a;
+        border: 2px solid #00ff00;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 25px;
+        box-shadow: 0 0 15px rgba(0, 255, 0, 0.2);
+      }
+
+      .category h2 {
+        color: #00ff00;
+        margin-bottom: 15px;
+        font-size: 1.3em;
+        border-bottom: 1px solid #003300;
+        padding-bottom: 10px;
+      }
+
+      .sound-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 12px;
+      }
+
+      .sound-button {
+        background: #002200;
+        color: #00ff00;
+        border: 1px solid #00ff00;
+        padding: 12px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-family: "Courier New", monospace;
+        font-size: 0.9em;
+        transition: all 0.2s;
+        text-align: left;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .sound-button:hover {
+        background: #003300;
+        border-color: #00ff00;
+        box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+        transform: translateY(-2px);
+      }
+
+      .sound-button:active {
+        transform: translateY(0);
+      }
+
+      .sound-button.playing {
+        background: #00ff00;
+        color: #000;
+        animation: pulse 1s infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          box-shadow: 0 0 10px #00ff00;
+        }
+        50% {
+          box-shadow: 0 0 20px #00ff00;
+        }
+      }
+
+      .footer {
+        text-align: center;
+        margin-top: 40px;
+        padding: 20px;
+        color: #006600;
+        font-size: 0.9em;
+      }
+
+      @media (max-width: 768px) {
+        .sound-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .static-controls {
+          flex-direction: column;
+          align-items: stretch;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>⚠ AGENT ARTHUR DONNELLEY ⚠</h1>
+      <div class="subtitle">Mobile Phone Communication Interface</div>
+
+      <!-- Static Background Control -->
+      <div class="static-control">
+        <h2>📡 Background Static</h2>
+        <div class="static-controls">
+          <button id="staticToggle" onclick="toggleStatic()">
+            Start Static
+          </button>
+          <div class="volume-control">
+            <label for="staticVolume">Static Volume:</label>
+            <input
+              type="range"
+              id="staticVolume"
+              min="0"
+              max="100"
+              value="15"
+              oninput="updateStaticVolume(this.value)"
+            />
+            <span class="volume-value" id="staticVolumeValue">15%</span>
+          </div>
+          <div class="volume-control">
+            <label for="voiceVolume">Voice Volume:</label>
+            <input
+              type="range"
+              id="voiceVolume"
+              min="0"
+              max="100"
+              value="100"
+              oninput="updateVoiceVolume(this.value)"
+            />
+            <span class="volume-value" id="voiceVolumeValue">100%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Introductions -->
+      <div class="category">
+        <h2>📞 Introductions & Initial Contact</h2>
+        <div class="sound-grid" id="introductions"></div>
+      </div>
+
+      <!-- Exploring the House -->
+      <div class="category">
+        <h2>🏚 Exploring the House</h2>
+        <div class="sound-grid" id="exploring"></div>
+      </div>
+
+      <!-- Simple Responses -->
+      <div class="category">
+        <h2>💬 Simple Responses</h2>
+        <div class="sound-grid" id="responses"></div>
+      </div>
+
+      <!-- Tension & Urgency -->
+      <div class="category">
+        <h2>⚡ Tension & Urgency</h2>
+        <div class="sound-grid" id="tension"></div>
+      </div>
+
+      <!-- Investigation Questions -->
+      <div class="category">
+        <h2>🔍 Investigation Questions</h2>
+        <div class="sound-grid" id="investigation"></div>
+      </div>
+
+      <!-- Calming & Reassurance -->
+      <div class="category">
+        <h2>🛡 Calming & Reassurance</h2>
+        <div class="sound-grid" id="calming"></div>
+      </div>
+
+      <!-- Delta Green -->
+      <div class="category">
+        <h2>🔺 Delta Green</h2>
+        <div class="sound-grid" id="deltagreen"></div>
+      </div>
+
+      <div class="footer">[ CLASSIFIED - DELTA GREEN OPERATIONS ]</div>
+    </div>
+
+    <audio id="staticAudio" loop>
+      <source src="sounds/static.mp3" type="audio/mpeg" />
+    </audio>
+
+    <script>
+      // Sound categories mapping
+      const sounds = {
+        introductions: [
+          "Agent Can you hear me.mp3",
+          "Its Arthur Donnelley.mp3",
+          "Donnelley here.mp3",
+          "Hello again agent.mp3",
+          "Me again.  Ready to continue.mp3",
+          "Glad you picked up. Times short.mp3",
+          "Im at 1206 Spooner Avenue.mp3",
+          "Come here tonight.mp3",
+          "Come alone.mp3",
+          "Look, I know it sounds strange. Just trust me.mp3",
+          "Goodbye.mp3",
+          "I have to go, agent.mp3",
+        ],
+        exploring: [
+          "Once youre inside, keep your phone on.mp3",
+          "You should be in the foyer. Whats the first thing that hits you.mp3",
+          "Alright, youre inside. Tell me what you see..mp3",
+          "Pick one of the bedrooms. Tell me what it looks like inside..mp3",
+          "Okay.  Time for another of the bedrooms..mp3",
+          "Go to the next bedroom. Anything different from the last one.mp3",
+          "Step into the master bedroom. Take your time—this one matters..mp3",
+          "Head into the den next. Whats the layout look like.mp3",
+          "Alright, check the garage. Tell me what jumps out first..mp3",
+          "Theres an attic room upstairs.  Go take a look.mp3",
+          "Okay.  Time for another of the bedrooms..mp3",
+        ],
+        responses: [
+          "Copy that..mp3",
+          "I see..mp3",
+          "Mm. Alright..mp3",
+          "Yes1.mp3",
+          "Yes2.mp3",
+          "Yes3.mp3",
+          "No I dont think so.mp3",
+          "No.mp3",
+          "no1!.mp3",
+          "No2.mp3",
+          "No!2.mp3",
+        ],
+        tension: [
+          "Youre wasting time. Move..mp3",
+          "Get back inside, agent.  We need to figure this out..mp3",
+          "Dont damage the house.mp3",
+          "Shutup and listen.mp3",
+          "Leaving now gives it the advantage. Staying puts you in control..mp3",
+          "Hold on something in your tone changed. Whatre you looking at.mp3",
+          "Wait whose voice is that Thats not yours..mp3",
+          "Youre breathing hard. Everything okay.mp3",
+          "The static is getting bad.mp3",
+          "I... the static is too bad.  I've got to go.mp3",
+          "Hang on—getting static on my end..mp3",
+          "Say again - the signals bad.mp3",
+          "Say again.mp3",
+          "What  I cant hear you.mp3",
+        ],
+        investigation: [
+          "Anything disturbed Look closely..mp3",
+          "Anything moved around Furniture, objects, dust patterns.mp3",
+          "Check under the bed and the closet. Just in case.mp3",
+          "Look at the walls—scuffs, scratches, anything like that.mp3",
+          "Look for personal items—books, photos. Anything stand out.mp3",
+          "Is there a smell in that room Wood, dust… anything odd.mp3",
+          "Whatever youre seeing, dont jump to conclusions. Just describe..mp3",
+          "Slow down. Describe the space. Details matter..mp3",
+          "Hold that thought. Keep describing the environment..mp3",
+        ],
+        calming: [
+          "Hey slow down. Whatever you saw, youre alright. Youre safe. Take a breath..mp3",
+          "Listen to my voice. Keep your attention here with me, not on whatever you think you saw..mp3",
+          "Youre not in danger. Trust me. Go back in and finish the sweep..mp3",
+          "Alright. Head back in, just a few steps. Keep the phone up. Im right here..mp3",
+          "Hold on sorry. Go ahead..mp3",
+          "If I tell you, youll go in expecting the wrong things.mp3",
+          "Every time I try to recall what happened there, the details slip.mp3",
+        ],
+        deltagreen: [
+          "I need to tell you something agent - you can't trust him.mp3",
+          "I need to tell you something agent - you can't trust her.mp3",
+          "He sent you to this house for a reason.mp3",
+          "She sent you to this house for a reason.mp3",
+          "I can help you agent.mp3",
+          "Lets do this.mp3",
+          "You with me.mp3",
+          "Well youre still on the line.mp3",
+          "There's a pattern here.mp3",
+          "Whatever you do, don't trust anyone but yourself.mp3",
+        ],
+      };
+
+      // Audio management
+      let currentlyPlaying = null;
+      const staticAudio = document.getElementById("staticAudio");
+      let staticPlaying = false;
+      let staticVolumeVariation;
+      let voiceVolume = 1.0; // Default to 100%
+
+      // Initialize soundboard
+      function initSoundboard() {
+        for (const [category, files] of Object.entries(sounds)) {
+          const container = document.getElementById(category);
+          files.forEach((file) => {
+            const button = document.createElement("button");
+            button.className = "sound-button";
+            button.textContent = file.replace(".mp3", "");
+            button.onclick = () => playSound(file, button);
+            container.appendChild(button);
+          });
+        }
+      }
+
+      // Play sound
+      function playSound(filename, button) {
+        // Stop currently playing sound
+        if (currentlyPlaying && currentlyPlaying.audio) {
+          currentlyPlaying.audio.pause();
+          currentlyPlaying.audio.currentTime = 0;
+          currentlyPlaying.button.classList.remove("playing");
+        }
+
+        const audio = new Audio("sounds/" + filename);
+        audio.volume = voiceVolume;
+        audio.play();
+        button.classList.add("playing");
+
+        currentlyPlaying = { audio, button };
+
+        audio.onended = () => {
+          button.classList.remove("playing");
+          if (currentlyPlaying && currentlyPlaying.audio === audio) {
+            currentlyPlaying = null;
+          }
+        };
+      }
+
+      // Static control functions
+      function toggleStatic() {
+        const button = document.getElementById("staticToggle");
+        if (staticPlaying) {
+          staticAudio.pause();
+          button.textContent = "Start Static";
+          button.classList.remove("active");
+          staticPlaying = false;
+          clearInterval(staticVolumeVariation);
+        } else {
+          const baseVolume =
+            document.getElementById("staticVolume").value / 100;
+          staticAudio.volume = baseVolume;
+          staticAudio.play();
+          button.textContent = "Stop Static";
+          button.classList.add("active");
+          staticPlaying = true;
+          startVolumeVariation();
+        }
+      }
+
+      function updateStaticVolume(value) {
+        const volume = value / 100;
+        staticAudio.volume = volume;
+        document.getElementById("staticVolumeValue").textContent = value + "%";
+      }
+
+      function updateVoiceVolume(value) {
+        voiceVolume = value / 100;
+        document.getElementById("voiceVolumeValue").textContent = value + "%";
+        // Update currently playing audio if any
+        if (currentlyPlaying && currentlyPlaying.audio) {
+          currentlyPlaying.audio.volume = voiceVolume;
+        }
+      }
+
+      function startVolumeVariation() {
+        // Add subtle volume variations over time
+        staticVolumeVariation = setInterval(() => {
+          if (staticPlaying) {
+            const baseVolume =
+              document.getElementById("staticVolume").value / 100;
+            const variation = (Math.random() - 0.5) * 0.1; // ±10% variation
+            const newVolume = Math.max(0, Math.min(1, baseVolume + variation));
+            staticAudio.volume = newVolume;
+          }
+        }, 3000); // Change every 3 seconds
+      }
+
+      // Initialize on page load
+      initSoundboard();
+      updateStaticVolume(15); // Set initial static volume
+      updateVoiceVolume(100); // Set initial voice volume
+    </script>
+  </body>
+</html>
