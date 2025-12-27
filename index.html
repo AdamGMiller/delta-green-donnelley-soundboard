@@ -228,6 +228,9 @@
           <button id="staticToggle" onclick="toggleStatic()">
             Start Static
           </button>
+          <button id="ringToggle" onclick="toggleRing()">
+            Ring Cell Phone
+          </button>
           <div class="volume-control">
             <label for="staticVolume">Static Volume:</label>
             <input
@@ -303,6 +306,9 @@
     <audio id="staticAudio" loop>
       <source src="sounds/static.mp3" type="audio/mpeg" />
     </audio>
+    <audio id="ringAudio">
+      <source src="sounds/cell phone ring.mp3" type="audio/mpeg" />
+    </audio>
 
     <script>
       // Sound categories mapping
@@ -323,8 +329,8 @@
         ],
         exploring: [
           "Once youre inside, keep your phone on.mp3",
-          "You should be in the foyer. Whats the first thing that hits you.mp3",
           "Alright, youre inside. Tell me what you see..mp3",
+          "You should be in the foyer. Whats the first thing that hits you.mp3",
           "Pick one of the bedrooms. Tell me what it looks like inside..mp3",
           "Okay.  Time for another of the bedrooms..mp3",
           "Go to the next bedroom. Anything different from the last one.mp3",
@@ -403,6 +409,9 @@
       let staticPlaying = false;
       let staticVolumeVariation;
       let voiceVolume = 1.0; // Default to 100%
+      const ringAudio = document.getElementById("ringAudio");
+      let ringPlaying = false;
+      let ringTimeout = null;
 
       // Initialize soundboard
       function initSoundboard() {
@@ -476,6 +485,47 @@
         if (currentlyPlaying && currentlyPlaying.audio) {
           currentlyPlaying.audio.volume = voiceVolume;
         }
+      }
+
+      function toggleRing() {
+        const button = document.getElementById("ringToggle");
+        if (ringPlaying) {
+          // Stop ringing
+          ringAudio.pause();
+          ringAudio.currentTime = 0;
+          if (ringTimeout) {
+            clearTimeout(ringTimeout);
+            ringTimeout = null;
+          }
+          button.textContent = "Ring Cell Phone";
+          button.classList.remove("active");
+          ringPlaying = false;
+        } else {
+          // Start ringing
+          ringPlaying = true;
+          button.textContent = "Stop Ringing";
+          button.classList.add("active");
+          playRingCycle();
+        }
+      }
+
+      function playRingCycle() {
+        if (!ringPlaying) return;
+
+        ringAudio.volume = voiceVolume;
+        ringAudio.currentTime = 0;
+        ringAudio.play();
+
+        ringAudio.onended = () => {
+          if (ringPlaying) {
+            // Wait 1 second, then play again
+            ringTimeout = setTimeout(() => {
+              if (ringPlaying) {
+                playRingCycle();
+              }
+            }, 1000);
+          }
+        };
       }
 
       function startVolumeVariation() {
